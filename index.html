@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetSim — Network Router Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo"><div class="logo-dot"></div>NetSim</div>
+    <div class="topbar-title">Network Router Simulator</div>
+    <div class="topbar-sep"></div>
+    <div class="status-bar">
+      <div class="status-led"></div>
+      <span id="status-text">Ready</span>
+    </div>
+    <div class="badge badge-teal" id="algo-badge">DVR</div>
+    <div class="badge badge-amber" id="conv-badge">Not Converged</div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Algorithm -->
+    <div class="panel-section">
+      <div class="panel-title">Algorithm</div>
+      <div class="algo-tabs">
+        <div class="algo-tab active" onclick="setAlgo('dvr')">Distance Vector</div>
+        <div class="algo-tab" onclick="setAlgo('lsa')">Link State</div>
+      </div>
+    </div>
+
+    <!-- Add Router -->
+    <div class="panel-section">
+      <div class="panel-title">Add Router</div>
+      <div class="field">
+        <label>Router Name</label>
+        <input type="text" id="router-name" placeholder="e.g. R5" maxlength="4">
+      </div>
+      <button class="btn btn-teal" onclick="addRouter()">Add Router</button>
+    </div>
+
+    <!-- Add Link -->
+    <div class="panel-section">
+      <div class="panel-title">Add Link</div>
+      <div class="field">
+        <label>From</label>
+        <select id="link-from"></select>
+      </div>
+      <div class="field">
+        <label>To</label>
+        <select id="link-to"></select>
+      </div>
+      <div class="field">
+        <label>Cost</label>
+        <input type="number" id="link-cost" value="1">
+      </div>
+      <button class="btn btn-blue" onclick="addLink()">Connect</button>
+    </div>
+
+    <!-- Packet Simulation -->
+    <div class="panel-section">
+      <div class="panel-title">Packet Simulation</div>
+      <div class="field">
+        <label>Source</label>
+        <select id="pkt-src"></select>
+      </div>
+      <div class="field">
+        <label>Destination</label>
+        <select id="pkt-dst"></select>
+      </div>
+      <button class="btn btn-amber" onclick="simulatePacket()">Send Packet</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="panel-section">
+      <div class="panel-title">Controls</div>
+      <div class="btn-row">
+        <button class="btn btn-teal btn-sm" onclick="stepAlgo()">Step</button>
+        <button class="btn btn-blue btn-sm" onclick="runToConverge()">Converge</button>
+      </div>
+      <div style="height:6px"></div>
+      <button class="btn btn-coral btn-sm" onclick="resetAll()">Reset</button>
+    </div>
+
+    <!-- DV OPTIONS -->
+    <div class="panel-section">
+      <div class="panel-title">DV Options</div>
+
+      <button class="btn btn-blue btn-sm" onclick="toggleSplitHorizon()">
+        Split Horizon
+      </button>
+
+      <div style="height:6px"></div>
+
+      <button class="btn btn-purple btn-sm" onclick="togglePoisonReverse()">
+        Poison Reverse
+      </button>
+    </div>
+
+    <!-- Routers -->
+    <div class="panel-title" style="padding:12px 16px 4px">Routers</div>
+    <div class="node-list" id="node-list"></div>
+
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-area" id="canvas-area">
+    <canvas id="canvas"></canvas>
+
+    <div class="canvas-toolbar">
+      <button class="canvas-btn active" id="mode-view" onclick="setMode('view')">View</button>
+      <button class="canvas-btn" id="mode-move" onclick="setMode('move')">Move</button>
+    </div>
+
+    <div class="canvas-hint" id="canvas-hint">
+      Add routers and connect them to start
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <div class="panel-section">
+      <div class="panel-title">Routing Tables</div>
+      <div class="field">
+        <label>Show table for</label>
+        <select id="rt-select" onchange="renderRoutingTable()">
+          <option value="">All Routers</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="rt-container" id="rt-container"></div>
+
+    <div class="step-controls">
+      <div class="step-info" id="step-info">
+        Step 0 — Run algorithm
+      </div>
+      <div class="step-progress">
+        <div class="step-fill" id="step-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="log-area" id="log-area"></div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Edit Link</div>
+
+    <div class="modal-field">
+      <label>Cost</label>
+      <input type="number" id="modal-cost">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-teal" onclick="saveModal()">Save</button>
+      <button class="btn btn-coral" onclick="deleteModalLink()">Delete</button>
+
+      <!-- ✅ FIXED BUTTONS -->
+      <button class="btn btn-coral" onclick="breakModalLink()">Break Link</button>
+      <button class="btn btn-green" onclick="restoreModalLink()">Restore Link</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
